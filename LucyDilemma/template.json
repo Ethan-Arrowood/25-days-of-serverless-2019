@@ -1,0 +1,357 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_etarrowo_25dos_name": {
+            "defaultValue": "etarrowo-25dos",
+            "type": "String"
+        },
+        "connections_twilio_externalid": {
+            "defaultValue": "/subscriptions/ec18dca1-0751-4307-bbac-6150896ac498/resourceGroups/etarrowo/providers/Microsoft.Web/connections/twilio",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_etarrowo_25dos_name')]",
+            "location": "eastus",
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        },
+                        "fromPhoneNumber": {
+                            "defaultValue": "+19175255274",
+                            "type": "String"
+                        }
+                    },
+                    "triggers": {
+                        "HTTP": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "properties": {
+                                        "phoneNumber": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "BreakTime": {
+                            "runAfter": {
+                                "Wait4Min2": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Return to the kitchen, take a break!",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "DeliverCoffee1": {
+                            "runAfter": {
+                                "Wait5Min2": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Deliver coffee to Mom and Dad",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "DeliverMoreCoffee": {
+                            "runAfter": {
+                                "Wait5Min3": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Deliver the coffee to Sister and Brother",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "GetMoreCoffee": {
+                            "runAfter": {
+                                "Wait4Min": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Return to kitchen, fill two more cups",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "Initialize_variable": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "toPhoneNumber",
+                                        "type": "string",
+                                        "value": "@triggerBody()?['phoneNumber']"
+                                    }
+                                ]
+                            }
+                        },
+                        "LightCandles": {
+                            "runAfter": {
+                                "Wait5Min": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Light the candles",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "PourTwoCups": {
+                            "runAfter": {
+                                "Wait25Min": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Pour two cups",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "RelightCandles": {
+                            "runAfter": {
+                                "Wait1Min": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Relight the candles",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "StartCoffee": {
+                            "runAfter": {
+                                "Initialize_variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "body": "Start the coffee, set out 4 cups",
+                                    "from": "@parameters('fromPhoneNumber')",
+                                    "to": "@variables('toPhoneNumber')"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['twilio']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "path": "/Messages.json"
+                            }
+                        },
+                        "Wait1Min": {
+                            "runAfter": {
+                                "GetMoreCoffee": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 1,
+                                    "unit": "Minute"
+                                }
+                            }
+                        },
+                        "Wait25Min": {
+                            "runAfter": {
+                                "StartCoffee": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 25,
+                                    "unit": "Minute"
+                                }
+                            }
+                        },
+                        "Wait4Min": {
+                            "runAfter": {
+                                "DeliverCoffee1": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 4,
+                                    "unit": "Minute"
+                                }
+                            }
+                        },
+                        "Wait4Min2": {
+                            "runAfter": {
+                                "DeliverMoreCoffee": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 4,
+                                    "unit": "Minute"
+                                }
+                            }
+                        },
+                        "Wait5Min": {
+                            "runAfter": {
+                                "PourTwoCups": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 5,
+                                    "unit": "Minute"
+                                }
+                            }
+                        },
+                        "Wait5Min2": {
+                            "runAfter": {
+                                "LightCandles": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 5,
+                                    "unit": "Minute"
+                                }
+                            }
+                        },
+                        "Wait5Min3": {
+                            "runAfter": {
+                                "RelightCandles": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 5,
+                                    "unit": "Minute"
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "twilio": {
+                                "connectionId": "[parameters('connections_twilio_externalid')]",
+                                "connectionName": "twilio",
+                                "id": "/subscriptions/ec18dca1-0751-4307-bbac-6150896ac498/providers/Microsoft.Web/locations/eastus/managedApis/twilio"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
