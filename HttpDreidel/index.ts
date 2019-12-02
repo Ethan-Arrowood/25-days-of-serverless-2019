@@ -11,7 +11,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     context.res = { 
         body: {
             hebrewCharacter: dreidelSidesHebrew[randomInt],
-            englishCharacter: dreidelSidesEnglish[randomInt]
+            englishTranslation: dreidelSidesEnglish[randomInt]
         }
     }
 };
