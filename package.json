@@ -9,9 +9,12 @@
     "start": "func start",
     "test": "tap"
   },
-  "dependencies": {},
+  "dependencies": {
+    "mssql": "^6.0.1"
+  },
   "devDependencies": {
     "@azure/functions": "^1.0.2-beta2",
+    "@types/node": "^12.12.14",
     "stub-azure-function-context": "^2.0.0-alpha.4",
     "tap": "^14.10.2",
     "typescript": "^3.3.3"
