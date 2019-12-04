@@ -1,7 +1,11 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { extname } from 'path'
-// import { Connection, Request } from 'tedious'
-import sql from 'mssql'
+
+if (process.env.NODE_ENV === 'testing') {
+    require('dotenv').config({ path: './test/.env.test'})
+}
+
+const sql = require('mssql')
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest) {
     context.log.info('Secret Santa Azure Function')
@@ -10,7 +14,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         user: process.env.SQL_DB_ADMIN_USERNAME,
         password: process.env.SQL_DB_ADMIN_PASSWORD,
         server: process.env.SQL_DB_URL,
-        database: "secret_santa_pictures"
+        database: "secret_santa_pictures",
+        encrypt: true
     }
 
     if (!req.body.hasOwnProperty('commits')) {
@@ -32,8 +37,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         const { commits, repository: { url }  } = req.body
 
         try {
-            await sql.connect(config)
-
+            await sql.connect(`mssql://${process.env.SQL_DB_ADMIN_USERNAME}:${process.env.SQL_DB_ADMIN_PASSWORD}@${process.env.SQL_DB_URL}/secret_santa_pictures?encrypt=true`)
+            context.log('Connection success')
             const imageUrls = []
             for (var commit of commits) {
                 for (var file of commit.added) {
@@ -42,13 +47,17 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                     }
                 }
             }
-
             const values = imageUrls.map(s => `('${s}')`).join(',')
-            
-            await sql.query`INSERT INTO [dbo].[Pictures] VALUES ${values}`
-
+            await sql.query(`INSERT INTO [dbo].[Pictures] VALUES ${values}`)
+            context.res = {
+                body: { imageUrls }
+            }
         } catch (err) {
             context.log.error(err)
+            context.res = {
+                status: 500,
+                body: err
+            }
         }
     }
     return context

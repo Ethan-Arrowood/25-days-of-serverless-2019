@@ -1,13 +1,14 @@
 {
-  "name": "25DaysOfServerless",
+  "name": "25-days-of-serverless",
   "version": "1.0.0",
   "description": "",
   "scripts": {
     "build": "tsc",
+    "build:production": "npm run prestart && npm prune --production",
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start": "func start",
-    "test": "tap"
+    "test": "NODE_ENV=testing tap --test-ignore=test/utils"
   },
   "dependencies": {
     "mssql": "^6.0.1"
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@azure/functions": "^1.0.2-beta2",
     "@types/node": "^12.12.14",
+    "dotenv": "^8.2.0",
     "stub-azure-function-context": "^2.0.0-alpha.4",
     "tap": "^14.10.2",
     "typescript": "^3.3.3"
